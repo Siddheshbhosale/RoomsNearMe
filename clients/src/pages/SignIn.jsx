@@ -12,6 +12,19 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useState } from 'react';
+
+import PropTypes from 'prop-types';
+import CircularProgress from '@mui/material/CircularProgress';
+import Stack from '@mui/material/Stack';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
+const defaultTheme = createTheme();
+
 
 function Copyright(props) {
     return (
@@ -27,9 +40,45 @@ function Copyright(props) {
 }
 
 
-const defaultTheme = createTheme();
+
 
 export default function SignIn() {
+    const [progress, setprogress] = useState(0);
+    const [open, setOpen] = React.useState(false);
+
+    const handleClick = () => {
+        setOpen(true);
+      };
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') {
+        return;
+        }
+        setOpen(false);
+    };
+
+    function CircularProgressWithLabel(props) {
+        return (
+            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
+                <CircularProgress variant="determinate" {...props} />
+                <Box
+                    sx={{
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        right: 0,
+                        position: 'absolute',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                    }}
+                >
+                    <Typography variant="caption" component="div" color="text.secondary">
+                        {`${Math.round(props.value)}%`}
+                    </Typography>
+                </Box>
+            </Box>
+        );
+    }
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -38,8 +87,17 @@ export default function SignIn() {
             email: data.get('email'),
             password: data.get('password'),
         });
+        handleClick();
+        // const timer = setInterval(() => {
+        //     setprogress((prevProgress) => {
+        //         const newProgress = prevProgress >= 100 ? 0 : prevProgress + 10;
+        //         if (newProgress === 0) {
+        //             clearInterval(timer); // Stop the interval when progress resets to 0
+        //         }
+        //         return newProgress;
+        //     });
+        // }, 800);
     };
-
     return (
         <ThemeProvider theme={defaultTheme}>
             <Grid container component="main" sx={{
@@ -60,7 +118,7 @@ export default function SignIn() {
                             backgroundPosition: 'center',
                         }}
                 /> */}
-                <Grid item xs={12} sm={8} md={5} sx={{ margin: '15px' }} component={Paper} elevation={6} square>
+                <Grid item xs={12} sm={8} md={4.5} sx={{ margin: '15px' }} component={Paper} elevation={6} square>
                     <Box
                         sx={{
                             my: 8,
@@ -101,14 +159,33 @@ export default function SignIn() {
                                 control={<Checkbox value="remember" color="primary" />}
                                 label="Remember me"
                             />
-                            <Button
-                                type="submit"
-                                fullWidth
-                                variant="contained"
-                                sx={{ mt: 3, mb: 2 }}
-                            >
-                                Sign In
-                            </Button>
+
+
+                            <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
+                                <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
+                                    This is a error message!
+                                </Alert>
+                            </Snackbar>
+
+                            {progress == 0 && (
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    variant="contained"
+                                    sx={{ mt: 3, mb: 2 }}
+                                >
+                                    Sign In
+                                </Button>
+                            )}
+                            {progress > 0 && (
+                                <Button
+                                    type="submit"
+                                    fullWidth
+                                    sx={{ mt: 3, mb: 2 }}
+                                >
+                                    <CircularProgressWithLabel value={progress} />
+                                </Button>
+                            )}
                             <Grid container>
                                 <Grid item xs>
                                     <Link href="#" variant="body2">
@@ -121,6 +198,7 @@ export default function SignIn() {
                                     </Link>
                                 </Grid>
                             </Grid>
+
                             <Copyright sx={{ mt: 5 }} />
                         </Box>
                     </Box>
