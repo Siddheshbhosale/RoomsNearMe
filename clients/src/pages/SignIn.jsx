@@ -19,9 +19,11 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import { authenticate, isAuthenticated, signin } from '../services/authenticate';
+import {useNavigate} from 'react-router-dom';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
-  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 const defaultTheme = createTheme();
 
@@ -44,50 +46,29 @@ function Copyright(props) {
 
 export default function SignIn() {
     const [progress, setprogress] = useState(0);
-    const [open, setOpen] = React.useState(false);
-
-    const handleClick = () => {
+    const [open, setOpen] = useState(false);
+    const [error, seterror] = useState("");
+    const navigate = useNavigate();
+    const ErrorHandleClick = () => {
         setOpen(true);
-      };
-    const handleClose = (event, reason) => {
+    };
+    const ErrorHandleClose = (event, reason) => {
         if (reason === 'clickaway') {
-        return;
+            return;
         }
         setOpen(false);
     };
 
-    function CircularProgressWithLabel(props) {
-        return (
-            <Box sx={{ position: 'relative', display: 'inline-flex' }}>
-                <CircularProgress variant="determinate" {...props} />
-                <Box
-                    sx={{
-                        top: 0,
-                        left: 0,
-                        bottom: 0,
-                        right: 0,
-                        position: 'absolute',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <Typography variant="caption" component="div" color="text.secondary">
-                        {`${Math.round(props.value)}%`}
-                    </Typography>
-                </Box>
-            </Box>
-        );
-    }
-
+    
     const handleSubmit = (event) => {
         event.preventDefault();
+        setprogress(true);
         const data = new FormData(event.currentTarget);
-        console.log({
+        const user = {
             email: data.get('email'),
             password: data.get('password'),
-        });
-        handleClick();
+        };
+        // ErrorHandleClick();
         // const timer = setInterval(() => {
         //     setprogress((prevProgress) => {
         //         const newProgress = prevProgress >= 100 ? 0 : prevProgress + 10;
@@ -97,6 +78,27 @@ export default function SignIn() {
         //         return newProgress;
         //     });
         // }, 800);
+
+        signin(user)
+            .then(data => {
+                if(data.Error){
+                    seterror(data.Error);
+                    ErrorHandleClick();
+                }
+                else{
+                    console.log(data);
+                    console.log("login in")
+                    authenticate(data);
+                    if(isAuthenticated())
+                        navigate( '/roomate');
+                }
+            })
+            .catch(err => {
+                seterror(err);
+                ErrorHandleClick();
+                console.log(err);
+            })
+        setprogress(false);
     };
     return (
         <ThemeProvider theme={defaultTheme}>
@@ -161,9 +163,9 @@ export default function SignIn() {
                             />
 
 
-                            <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={handleClose}>
-                                <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>
-                                    This is a error message!
+                            <Snackbar anchorOrigin={{ vertical: 'top', horizontal: 'right' }} open={open} autoHideDuration={6000} onClose={ErrorHandleClose}>
+                                <Alert onClose={ErrorHandleClose} severity="error" sx={{ width: '100%' }}>
+                                  {`${error}`}
                                 </Alert>
                             </Snackbar>
 
@@ -183,7 +185,7 @@ export default function SignIn() {
                                     fullWidth
                                     sx={{ mt: 3, mb: 2 }}
                                 >
-                                    <CircularProgressWithLabel value={progress} />
+                                    <CircularProgress />
                                 </Button>
                             )}
                             <Grid container>

@@ -19,7 +19,8 @@ import { useEffect, useState } from "react";
 
 //react import
 import { NavLink } from 'react-router-dom';
-import { isAuthenticated } from "../services/authenticate";
+import { isAuthenticated, signout } from "../services/authenticate";
+import { useNavigate } from 'react-router-dom';
 
 const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -27,6 +28,7 @@ function Navbar() {
   const [pages, setPages] = useState([]);
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
   const auth = isAuthenticated();
 
   const handleOpenNavMenu = (event) => {
@@ -40,7 +42,13 @@ function Navbar() {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
+  const handleCloseUserMenu = (e, setting) => {
+    console.log(setting);
+    if (setting == 'Logout') {
+      signout(() => {
+        navigate('/signin');
+      })
+    }
     setAnchorElUser(null);
   };
 
@@ -147,7 +155,6 @@ function Navbar() {
           </Typography>
 
 
-
           {/* // Desktop view*/}
           <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" }, justifyContent: 'flex-end' }}>
             {pages.map((page) => (
@@ -171,28 +178,30 @@ function Navbar() {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-            >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">{setting}</Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+            {isAuthenticated() &&
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                {settings.map((setting) => (
+                  <MenuItem key={setting} onClick={(e) => handleCloseUserMenu(e, setting)}>
+                    <Typography textAlign="center">{setting}</Typography>
+                  </MenuItem>
+                ))}
+              </Menu>
+            }
           </Box>
         </Toolbar>
       </Container>

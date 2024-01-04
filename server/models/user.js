@@ -52,7 +52,7 @@ userSchema.methods = {
             .update(plainPassword)
             .digest('hex');
         } catch (error) {
-            return "";
+            return "error";
         }
 
     }
