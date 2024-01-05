@@ -22,14 +22,16 @@ import { NavLink } from 'react-router-dom';
 import { isAuthenticated, signout } from "../services/authenticate";
 import { useNavigate } from 'react-router-dom';
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
 function Navbar() {
-  const [pages, setPages] = useState([]);
+  // const [pages, setPages] = useState([]);
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const [pages,setPages] = useState([]);
+  const settings = ["Profile", "Account", "Dashboard", "Logout"];
+  const [auth,setauth] = useState(isAuthenticated());
   const navigate = useNavigate();
-  const auth = isAuthenticated();
+
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -37,11 +39,9 @@ function Navbar() {
   const handleOpenUserMenu = (event) => {
     setAnchorElUser(event.currentTarget);
   };
-
   const handleCloseNavMenu = (event) => {
     setAnchorElNav(null);
   };
-
   const handleCloseUserMenu = (e, setting) => {
     console.log(setting);
     if (setting == 'Logout') {
@@ -52,20 +52,19 @@ function Navbar() {
     setAnchorElUser(null);
   };
 
+
   useEffect(() => {
-    if (auth) {
-      setPages(["Home", "Roomate", "OnRent", "Buy"]);
+    if (isAuthenticated()) {
+      setPages(["Dashboard","Home", "Roomate", "OnRent", "Buy"]);
     } else {
       setPages(["Home", "SignIn", "Signup"]);
     }
-  }, []);
+  },[isAuthenticated()]);
 
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-
-
           {/* // mobile view */}
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
@@ -178,7 +177,7 @@ function Navbar() {
                 <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
               </IconButton>
             </Tooltip>
-            {isAuthenticated() &&
+            {isAuthenticated() && 
               <Menu
                 sx={{ mt: "45px" }}
                 id="menu-appbar"
@@ -196,12 +195,13 @@ function Navbar() {
                 onClose={handleCloseUserMenu}
               >
                 {settings.map((setting) => (
-                  <MenuItem key={setting} onClick={(e) => handleCloseUserMenu(e, setting)}>
-                    <Typography textAlign="center">{setting}</Typography>
-                  </MenuItem>
+                    <MenuItem key={setting} onClick={(e) => handleCloseUserMenu(e, setting)}>
+                      <Typography textAlign="center">{setting}</Typography>
+                    </MenuItem>
                 ))}
               </Menu>
             }
+          
           </Box>
         </Toolbar>
       </Container>

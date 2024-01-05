@@ -1,6 +1,6 @@
 
 const Buy = () => {
-return <div>Buy</div>
+return <div className="Atcenter">Buy</div>
 }
 
 export default Buy;

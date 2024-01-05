@@ -1,0 +1,7 @@
+.Atcenter{
+    display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 75vh; /* Optional: Adjust the height as needed */
+  font-size: 100px;
+}

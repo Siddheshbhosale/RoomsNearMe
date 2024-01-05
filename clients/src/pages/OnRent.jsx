@@ -1,6 +1,6 @@
 
 const OnRent = () => {
-    return <div>OnRent</div>
+    return <div className="Atcenter">OnRent</div>
     }
     
     export default OnRent;

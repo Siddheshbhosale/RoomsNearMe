@@ -90,7 +90,7 @@ export default function SignIn() {
                     console.log("login in")
                     authenticate(data);
                     if(isAuthenticated())
-                        navigate( '/roomate');
+                        navigate( '/dashboard');
                 }
             })
             .catch(err => {

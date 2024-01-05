@@ -1,5 +1,5 @@
 const Roomate = () => {
-    return <div>Roomate</div>
+    return <div className="Atcenter">Roomate</div>
     }
     
 export default Roomate;
